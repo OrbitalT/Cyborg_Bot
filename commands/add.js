@@ -1,5 +1,6 @@
 module.exports = {
     commands: 'add',
+    description: 'Adds things',
     expectedArgs: '<num1> <num2>',
     minArgs: 2,
     maxArgs: 2,
