@@ -1,52 +1,67 @@
-const { MongoClient } = require('mongodb')
-const { MongoDBProvider } = require('commando-provider-mongo')
+const DiscordJS = require('discord.js')
+const WOKCommands = require('wokcommands')
 const path = require('path')
-const Commando = require('discord.js-commando')
-
 const config = require('./config/config.json')
-const loadCommands = require('./commands/load-commands')
-const commandBase = require('./commands/command-base')
-const loadFeatures = require('./features/load-features')
-const mongo = require('./util/mongo')
 
-const modLogs = require('./features/features/mod-logs')
+const { Intents } = DiscordJS
 
-const client = new Commando.CommandoClient({
-  owner: '210004181845671936',
-  commandPrefix: config.prefix,
+const client = new DiscordJS.Client({
+  // These intents are recommended for the built in help menu
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+  ],
 })
 
-client.setProvider(
-  MongoClient.connect(config.mongoPath, {
-    useUnifiedTopology: true
+client.on('ready', () => {
+  // The client object is required as the first argument.
+  // The second argument is the options object.
+  // All properties of this object are optional.
+
+  new WOKCommands(client, {
+      // The name of the local folder for your command files
+      commandsDir: path.join(__dirname, 'commands'),
+      
+      // The name of the local folder for your feature files
+      featuresDir: path.join(__dirname, 'features'),
+      
+      // The name of the local file for your message text and translations
+      // Omitting this will use the built-in message path
+      messagesPath: '',
+      
+      // If WOKCommands warning should be shown or not, default true
+      showWarns: true,
+      
+      // How many seconds to keep error messages before deleting them
+      // -1 means do not delete, defaults to -1
+      delErrMsgCooldown: -1,
+      defaultLangauge: 'english',
+      
+      // If your commands should not be ran by a bot, default false
+      ignoreBots: false,
+      dbOptions: {
+          keepAlive: true,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          useFindAndModify: false,
+      },
+      
+      // What built-in commands should be disabled.
+      // Note that you can overwrite a command as well by using
+      // the same name as the command file name.
+      disabledDefaultCommands: [
+          // 'help',
+          // 'command',
+          // 'language',
+          // 'prefix',
+          // 'requiredrole'
+      ]
   })
-    .then((client) => {
-      return new MongoDBProvider(client, 'CyberBot')
-    })
-    .catch((err) => {
-      console.error(err)
-    })
-)
-
-client.on('ready', async () => {
-  console.log('The client is ready!')
-
-  await mongo()
-
-  client.registry
-    .registerGroups([
-      ['misc', 'misc commands'],
-      ['moderation', 'moderation commands'],
-      ['economy', 'Commands for the economy system']
-    ])
-    .registerDefaults()
-    .registerCommandsIn(path.join(__dirname, 'cmds'))
-
-  // commandBase.loadPrefixes(client)
-  // loadCommands(client)
-  loadFeatures(client)
-
-  modLogs(client)
+      .setDefaultPrefix('!')
+      .setColor(0xff0000)
+      .setMongoPath(config.mongoPath)
+      .setBotOwner('210004181845671936')
 })
 
 client.login(config.token)

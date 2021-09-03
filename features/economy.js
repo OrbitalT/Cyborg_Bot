@@ -1,4 +1,4 @@
-const profileSchema = require('../../schemas/profile-schema')
+const profileSchema = require('../schemas/profile-schema')
 
 const coinsCache = {} // { 'guildId-userId': coins }
 

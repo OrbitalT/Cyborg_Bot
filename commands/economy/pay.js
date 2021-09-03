@@ -1,10 +1,12 @@
-const economy = require('../../../features/features/economy')
+const economy = require('../../features/economy')
 
 module.exports = {
   commands: 'pay',
   minArgs: 2,
   maxArgs: 2,
   expectedArgs: "<Target user's @> <Amount of coins>",
+  category: 'economy',
+  description: 'Pays a user coins.',
   callback: async (message, arguments, text) => {
     const { guild, member } = message
 
