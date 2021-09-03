@@ -37,16 +37,13 @@ client.on('ready', async () => {
     .registerGroups([
       ['misc', 'misc commands'],
       ['moderation', 'moderation commands'],
-      ['economy', 'Commands for the economy system'],
-      ['giveaway', 'Commands to manage giveaways'],
-      ['games', 'Commands to handle games'],
-      ['thanks', 'Commands to help thank people'],
+      ['economy', 'Commands for the economy system']
     ])
     .registerDefaults()
     .registerCommandsIn(path.join(__dirname, 'cmds'))
 
-  commandBase.loadPrefixes(client)
-  loadCommands(client)
+  // commandBase.loadPrefixes(client)
+  // loadCommands(client)
   loadFeatures(client)
 
   modLogs(client)
