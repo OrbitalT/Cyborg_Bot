@@ -7,7 +7,7 @@ module.exports = {
   expectedArgs: "<Target user's @> <Amount of coins>",
   category: 'economy',
   description: 'Pays a user coins.',
-  callback: async (message, arguments, text) => {
+  callback: async ({ message, args }) => {
     const { guild, member } = message
 
     const target = message.mentions.users.first()
@@ -16,7 +16,7 @@ module.exports = {
       return
     }
 
-    const coinsToGive = arguments[1]
+    const coinsToGive = args[1]
     if (isNaN(coinsToGive)) {
       message.reply('Please provide a valid number of coins to give.')
       return

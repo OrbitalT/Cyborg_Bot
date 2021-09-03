@@ -6,19 +6,16 @@ module.exports = {
   expectedArgs: "[Target user's @]",
   category: 'economy',
   description: "Displays a user's coins.",
-  callback: async (message) => {
+  callback: async ({ message }) => {
 
-    const { author } = message
-    console.log(author);
+    const target = message.mentions.users.first() || message.author
+    const targetId = target.id
 
-    // const target = message.mentions.users.first() || message.author
-    // const targetId = target.id
+    const guildId = message.guild.id
+    const userId = target.id
 
-    // const guildId = message.guild.id
-    // const userId = target.id
+    const coins = await economy.getCoins(guildId, userId)
 
-    // const coins = await economy.getCoins(guildId, userId)
-
-    // message.reply(`That user has ${coins} coins!`)
+    message.reply(`That user has ${coins} coins!`)
   },
 }

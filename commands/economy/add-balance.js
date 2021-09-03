@@ -9,7 +9,7 @@ module.exports = {
   permissions: ['ADMINISTRATOR'],
   category: 'economy',
   description: 'Gives a user coins.',
-  callback: async (message, arguments) => {
+  callback: async ({ message, args }) => {
     const mention = message.mentions.users.first()
 
     if (!mention) {
@@ -17,7 +17,7 @@ module.exports = {
       return
     }
 
-    const coins = arguments[1]
+    const coins = args[1]
     if (isNaN(coins)) {
       message.reply('Please provide a valid numnber of coins.')
       return
