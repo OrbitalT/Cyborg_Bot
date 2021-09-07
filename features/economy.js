@@ -59,3 +59,17 @@ module.exports.getCoins = async (guildId, userId) => {
 
   return coins
 }
+
+module.exports.config = {
+  // The display name that server owners will see.
+  // This can be changed at any time.
+  displayName: 'Economy',
+  
+  // The name the database will use to set if it is enabled or not.
+  // This should NEVER be changed once set, and users cannot see it.
+  dbName: 'ECONOMY',
+  
+  // Being true means a database connection must be present before the
+  // feature is enabled.
+  loadDBFirst: true
+}

@@ -15,10 +15,6 @@ const client = new DiscordJS.Client({
 })
 
 client.on('ready', () => {
-  // The client object is required as the first argument.
-  // The second argument is the options object.
-  // All properties of this object are optional.
-
   new WOKCommands(client, {
       // The name of the local folder for your command files
       commandsDir: path.join(__dirname, 'commands'),
@@ -62,6 +58,17 @@ client.on('ready', () => {
       .setColor(0xff0000)
       .setMongoPath(config.mongoPath)
       .setBotOwner('210004181845671936')
+
+      .setCategorySettings([
+        {
+          name: 'Economy',
+          emoji: '💸'
+        },
+        {
+          name: 'Misc',
+          emoji: '🎲'
+        }
+    ])
 })
 
 client.login(config.token)

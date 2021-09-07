@@ -5,7 +5,7 @@ module.exports = {
   minArgs: 2,
   maxArgs: 2,
   expectedArgs: "<Target user's @> <Amount of coins>",
-  category: 'economy',
+  category: 'Economy',
   description: 'Pays a user coins.',
   callback: async ({ message, args }) => {
     const { guild, member } = message

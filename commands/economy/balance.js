@@ -4,7 +4,7 @@ module.exports = {
   commands: ['balance', 'bal'],
   maxArgs: 1,
   expectedArgs: "[Target user's @]",
-  category: 'economy',
+  category: 'Economy',
   description: "Displays a user's coins.",
   callback: async ({ message }) => {
 
