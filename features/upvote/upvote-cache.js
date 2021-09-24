@@ -14,40 +14,48 @@ const addToCache = async (guildId, message) => {
   cache[guildId] = array
 }
 
-const handleReaction = (reaction, user, adding) => {
+const handleReaction = async (reaction, user, adding) => {
+  const channelTag = '884574659230728243'
+  const botID = '882110782538670161'
   const { message } = reaction
   const { guild } = message
+
+  if (user.id === botID) {
+    return
+  }
 
   //If User Upvotes a video then the reactCounter goes up
   //Video Timestamp is 36 mins
 
-  // const [fetchedMessage, roles] = fetchCache(guild.id)
-  // if (!fetchedMessage) {
-  //   return
-  // }
+  const [fetchedMessage] = fetchCache(guild.id)
 
-  // if (
-  //   fetchedMessage.id === message.id &&
-  //   guild.me.hasPermission('MANAGE_ROLES')
-  // ) {
-  //   const toCompare = reaction.emoji.id || reaction.emoji.name
+  if (!fetchedMessage) {
+    return
+  }
 
-  //   for (const key of Object.keys(roles)) {
-  //     if (key === toCompare) {
-  //       const role = guild.roles.cache.get(roles[key])
-  //       if (role) {
-  //         const member = guild.members.cache.get(user.id)
+  //Fetchedmessage is last message cached, does not loop through cached messages
+  if (fetchedMessage.id === message.id) {
+    console.log(fetchedMessage.id, reaction.count);
 
-  //         if (adding) {
-  //           member.roles.add(role)
-  //         } else {
-  //           member.roles.remove(role)
-  //         }
-  //       }
-  //       return
-  //     }
-  //   }
-  // }
+    const obj = {
+      guildId: guild.id,
+      channelId: fetchedMessage.channel.id,
+      messageId: fetchedMessage.id,
+    }
+
+    await upvotesSchema.findOneAndUpdate(
+      obj,
+      {
+        ...obj,
+        $set: {
+          reactCount: reaction.count,
+        },
+      },
+      {
+        upsert: true,
+      }
+    )
+  }
 }
 
 module.exports = async (client) => {
@@ -59,6 +67,7 @@ module.exports = async (client) => {
     handleReaction(reaction, user, false)
   })
 
+  //Getting Data from DB
   const results = await upvotesSchema.find()
 
   for (const result of results) {
@@ -90,14 +99,8 @@ module.exports = async (client) => {
       )
 
       if (fetchedMessage) {
-        // const newRoles = {}
-
-        // for (const role of roles) {
-        //   const { emoji, roleId } = role
-        //   newRoles[emoji] = roleId
-        // }
-
-        // cache[guildId] = [fetchedMessage, newRoles]
+        cache[guildId] = [fetchedMessage]
+        // console.log(cache[guildId]);
       }
     } catch (e) {
       console.log(`Removing message ID "${messageId}" from the database`)
@@ -107,7 +110,7 @@ module.exports = async (client) => {
 }
 
 module.exports.fetchCache = fetchCache
-// module.exports.addToCache = addToCache
+module.exports.addToCache = addToCache
 
 module.exports.config = {
   // The display name that server owners will see.
