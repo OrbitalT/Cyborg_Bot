@@ -1,0 +1,5 @@
+{
+    "token": "YOUR TOKEN",
+    "prefix": "!",
+    "mongoPath": "mongodb://IP:27017/DB-NAME"
+}
