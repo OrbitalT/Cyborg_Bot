@@ -1,62 +1,63 @@
 const upvotesSchema = require('../../schemas/upvotes-schema')
 
-// const cache = {} // { guildId: [message, { Emoji: RoleID }] }
+const cache = {} // { guildId: [message, { Emoji: RoleID }] }
 
-// const fetchCache = (guildId) => cache[guildId] || []
+const fetchCache = (guildId) => cache[guildId] || []
 
-// const addToCache = async (guildId, message, emoji, roleId) => {
-//   const array = cache[guildId] || [message, {}]
+//Video Timestamp is 32 mins
 
-//   if (emoji && roleId) {
-//     array[1][emoji] = roleId
-//   }
+const addToCache = async (guildId, message) => {
+  const array = cache[guildId] || [message]
 
-//   await message.channel.messages.fetch(message.id, true, true)
+  await message.channel.messages.fetch(message.id, true, true)
 
-//   cache[guildId] = array
-// }
+  cache[guildId] = array
+}
 
-// const handleReaction = (reaction, user, adding) => {
-//   const { message } = reaction
-//   const { guild } = message
+const handleReaction = (reaction, user, adding) => {
+  const { message } = reaction
+  const { guild } = message
 
-//   const [fetchedMessage, roles] = fetchCache(guild.id)
-//   if (!fetchedMessage) {
-//     return
-//   }
+  //If User Upvotes a video then the reactCounter goes up
+  //Video Timestamp is 36 mins
 
-//   if (
-//     fetchedMessage.id === message.id &&
-//     guild.me.hasPermission('MANAGE_ROLES')
-//   ) {
-//     const toCompare = reaction.emoji.id || reaction.emoji.name
+  // const [fetchedMessage, roles] = fetchCache(guild.id)
+  // if (!fetchedMessage) {
+  //   return
+  // }
 
-//     for (const key of Object.keys(roles)) {
-//       if (key === toCompare) {
-//         const role = guild.roles.cache.get(roles[key])
-//         if (role) {
-//           const member = guild.members.cache.get(user.id)
+  // if (
+  //   fetchedMessage.id === message.id &&
+  //   guild.me.hasPermission('MANAGE_ROLES')
+  // ) {
+  //   const toCompare = reaction.emoji.id || reaction.emoji.name
 
-//           if (adding) {
-//             member.roles.add(role)
-//           } else {
-//             member.roles.remove(role)
-//           }
-//         }
-//         return
-//       }
-//     }
-//   }
-// }
+  //   for (const key of Object.keys(roles)) {
+  //     if (key === toCompare) {
+  //       const role = guild.roles.cache.get(roles[key])
+  //       if (role) {
+  //         const member = guild.members.cache.get(user.id)
+
+  //         if (adding) {
+  //           member.roles.add(role)
+  //         } else {
+  //           member.roles.remove(role)
+  //         }
+  //       }
+  //       return
+  //     }
+  //   }
+  // }
+}
 
 module.exports = async (client) => {
-  // client.on('messageReactionAdd', (reaction, user) => {
-  //   handleReaction(reaction, user, true)
-  // })
+  client.on('messageReactionAdd', (reaction, user) => {
+    handleReaction(reaction, user, true)
+  })
 
-  // client.on('messageReactionRemove', (reaction, user) => {
-  //   handleReaction(reaction, user, false)
-  // })
+  client.on('messageReactionRemove', (reaction, user) => {
+    handleReaction(reaction, user, false)
+  })
 
   const results = await upvotesSchema.find()
 
@@ -104,6 +105,9 @@ module.exports = async (client) => {
     }
   }
 }
+
+module.exports.fetchCache = fetchCache
+// module.exports.addToCache = addToCache
 
 module.exports.config = {
   // The display name that server owners will see.
