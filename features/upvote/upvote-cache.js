@@ -1,73 +1,73 @@
-const messageSchema = require('../models/message')
+const upvotesSchema = require('../../schemas/upvotes-schema')
 
-const cache = {} // { guildId: [message, { Emoji: RoleID }] }
+// const cache = {} // { guildId: [message, { Emoji: RoleID }] }
 
-const fetchCache = (guildId) => cache[guildId] || []
+// const fetchCache = (guildId) => cache[guildId] || []
 
-const addToCache = async (guildId, message, emoji, roleId) => {
-  const array = cache[guildId] || [message, {}]
+// const addToCache = async (guildId, message, emoji, roleId) => {
+//   const array = cache[guildId] || [message, {}]
 
-  if (emoji && roleId) {
-    array[1][emoji] = roleId
-  }
+//   if (emoji && roleId) {
+//     array[1][emoji] = roleId
+//   }
 
-  await message.channel.messages.fetch(message.id, true, true)
+//   await message.channel.messages.fetch(message.id, true, true)
 
-  cache[guildId] = array
-}
+//   cache[guildId] = array
+// }
 
-const handleReaction = (reaction, user, adding) => {
-  const { message } = reaction
-  const { guild } = message
+// const handleReaction = (reaction, user, adding) => {
+//   const { message } = reaction
+//   const { guild } = message
 
-  const [fetchedMessage, roles] = fetchCache(guild.id)
-  if (!fetchedMessage) {
-    return
-  }
+//   const [fetchedMessage, roles] = fetchCache(guild.id)
+//   if (!fetchedMessage) {
+//     return
+//   }
 
-  if (
-    fetchedMessage.id === message.id &&
-    guild.me.hasPermission('MANAGE_ROLES')
-  ) {
-    const toCompare = reaction.emoji.id || reaction.emoji.name
+//   if (
+//     fetchedMessage.id === message.id &&
+//     guild.me.hasPermission('MANAGE_ROLES')
+//   ) {
+//     const toCompare = reaction.emoji.id || reaction.emoji.name
 
-    for (const key of Object.keys(roles)) {
-      if (key === toCompare) {
-        const role = guild.roles.cache.get(roles[key])
-        if (role) {
-          const member = guild.members.cache.get(user.id)
+//     for (const key of Object.keys(roles)) {
+//       if (key === toCompare) {
+//         const role = guild.roles.cache.get(roles[key])
+//         if (role) {
+//           const member = guild.members.cache.get(user.id)
 
-          if (adding) {
-            member.roles.add(role)
-          } else {
-            member.roles.remove(role)
-          }
-        }
-        return
-      }
-    }
-  }
-}
+//           if (adding) {
+//             member.roles.add(role)
+//           } else {
+//             member.roles.remove(role)
+//           }
+//         }
+//         return
+//       }
+//     }
+//   }
+// }
 
 module.exports = async (client) => {
-  client.on('messageReactionAdd', (reaction, user) => {
-    handleReaction(reaction, user, true)
-  })
+  // client.on('messageReactionAdd', (reaction, user) => {
+  //   handleReaction(reaction, user, true)
+  // })
 
-  client.on('messageReactionRemove', (reaction, user) => {
-    handleReaction(reaction, user, false)
-  })
+  // client.on('messageReactionRemove', (reaction, user) => {
+  //   handleReaction(reaction, user, false)
+  // })
 
-  const results = await messageSchema.find()
+  const results = await upvotesSchema.find()
 
   for (const result of results) {
-    const { guildId, channelId, messageId, roles } = result
+    const { guildId, channelId, messageId, reactCount } = result
 
     const guild = await client.guilds.cache.get(guildId)
 
     if (!guild) {
       console.log(`Removing guild ID "${guildId}" from the database`)
-      await messageSchema.deleteOne({ guildId })
+      await upvotesSchema.deleteOne({ guildId })
       return
     }
 
@@ -75,7 +75,7 @@ module.exports = async (client) => {
 
     if (!channel) {
       console.log(`Removing channel ID "${channelId}" from the database`)
-      await messageSchema.deleteOne({ channelId })
+      await upvotesSchema.deleteOne({ channelId })
       return
     }
 
@@ -89,21 +89,32 @@ module.exports = async (client) => {
       )
 
       if (fetchedMessage) {
-        const newRoles = {}
+        // const newRoles = {}
 
-        for (const role of roles) {
-          const { emoji, roleId } = role
-          newRoles[emoji] = roleId
-        }
+        // for (const role of roles) {
+        //   const { emoji, roleId } = role
+        //   newRoles[emoji] = roleId
+        // }
 
-        cache[guildId] = [fetchedMessage, newRoles]
+        // cache[guildId] = [fetchedMessage, newRoles]
       }
     } catch (e) {
       console.log(`Removing message ID "${messageId}" from the database`)
-      await messageSchema.deleteOne({ messageId })
+      await upvotesSchema.deleteOne({ messageId })
     }
   }
 }
 
-module.exports.fetchCache = fetchCache
-module.exports.addToCache = addToCache
+module.exports.config = {
+  // The display name that server owners will see.
+  // This can be changed at any time.
+  displayName: 'Upvotes Cache Check',
+
+  // The name the database will use to set if it is enabled or not.
+  // This should NEVER be changed once set, and users cannot see it.
+  dbName: 'UPCACHECHECK',
+
+  // Being true means a database connection must be present before the
+  // feature is enabled.
+  loadDBFirst: false
+}
